@@ -1,5 +1,30 @@
-
 import pygame
+
+pygame.init()
+
+# Configurações da janela
+window_width = 800
+window_height = 600
+window = pygame.display.set_mode((window_width, window_height))
+pygame.display.set_caption("Space Marker Eduardo e Anderson")
+
+icon_image = pygame.image.load("space.png")
+pygame.display.set_icon(icon_image)
+
+# Carregar imagem de fundo
+background_image = pygame.image.load("spacemarker.jpg")
+background_image = pygame.transform.scale(background_image, (window_width, window_height))
+
+# Configurações do círculo e das marcações
+circle_radius = 5
+marks = []  # Lista para armazenar as marcações (nome e coordenadas)
+unknown_point = None  # Coordenadas do ponto "desconhecido"
+
+font = pygame.font.Font(None, 20)
+text_color = (255, 255, 255)
+message_1 = "Pressione C para carregar os pontos"
+message_2 = "Pressione E para excluir os pontos"
+message_3 = "Pressione S para salvar os pontos"import pygame
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 
@@ -43,3 +68,41 @@ def calculate_distance(p1, p2):
     x2, y2 = p2
     distance = abs(x2 - x1) + abs(y2 - y1)
     return distance
+
+import pygame
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+
+# Loop principal e interação do usuário
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            save_marks()
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                save_marks()
+                running = False
+            elif event.key == pygame.K_c:
+                load_marks()
+            elif event.key == pygame.K_e:
+                clear_marks()
+            elif event.key == pygame.K_s:
+                save_marks()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            x, y = pygame.mouse.get_pos()
+            root = tk.Tk()
+            root.withdraw()
+            name = simpledialog.askstring("Nome da estrela", "Digite o nome da estrela:")
+            root.destroy()
+            if name:
+                current_point = (x, y)
+                if name.lower() == "desconhecido":
+                    unknown_point = current_point
+                    messagebox.showinfo("Mensagem", f"Nome: {name}\nCoordenadas: {current_point}")
+                else:
+                    marks.append((name, current_point))
+                    messagebox.showinfo("Mensagem", f"Nome: {name}\nCoordenadas: {current_point}")
+
+
