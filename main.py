@@ -1,4 +1,6 @@
 import pygame
+import tkinter as tk
+from tkinter import messagebox, simpledialog
 
 pygame.init()
 
@@ -24,11 +26,12 @@ font = pygame.font.Font(None, 20)
 text_color = (255, 255, 255)
 message_1 = "Pressione C para carregar os pontos"
 message_2 = "Pressione E para excluir os pontos"
-message_3 = "Pressione S para salvar os pontos"import pygame
-import tkinter as tk
-from tkinter import messagebox, simpledialog
+message_3 = "Pressione S para salvar os pontos"
 
-# Funções de manipulação de marcações
+# Carregar música em loop infinito
+pygame.mixer.music.load("musica_suspense.mp3")
+pygame.mixer.music.play(-1) 
+
 def save_marks():
     try:
         with open("marks.txt", "w") as file:
@@ -69,11 +72,6 @@ def calculate_distance(p1, p2):
     distance = abs(x2 - x1) + abs(y2 - y1)
     return distance
 
-import pygame
-import tkinter as tk
-from tkinter import messagebox, simpledialog
-
-# Loop principal e interação do usuário
 running = True
 while running:
     for event in pygame.event.get():
@@ -105,34 +103,42 @@ while running:
                     marks.append((name, current_point))
                     messagebox.showinfo("Mensagem", f"Nome: {name}\nCoordenadas: {current_point}")
 
+    # Desenhar imagem de fundo
+    window.blit(background_image, (0, 0))
 
-# Desenho dos elementos na tela
-# Desenhar imagem de fundo
-window.blit(background_image, (0, 0))
+    # Desenhar as marcações no círculo e traçar linhas
+    for i in range(len(marks)):
+        name, pos = marks[i]
+        pygame.draw.circle(window, (255, 255, 255), pos, circle_radius)
+        text_surface = font.render(name, True, (255, 255, 255))
+        window.blit(text_surface, (pos[0] + 10, pos[1]))
+        if i > 0:
+            prev_name, prev_pos = marks[i - 1]
+            pygame.draw.line(window, (255, 255, 255), prev_pos, pos, 1)
+            distance = calculate_distance(prev_pos, pos)
+            text_surface = font.render(str(distance), True, (255, 255, 255))
+            line_center = ((prev_pos[0] + pos[0]) // 2, (prev_pos[1] + pos[1]) // 2)
+            window.blit(text_surface, (line_center[0] + 10, line_center[1] + 10))
+    if unknown_point is not None:
+        if len(marks) > 0:
+            prev_pos = marks[-1][1]
+            pygame.draw.line(window, (255, 255, 255), prev_pos, unknown_point, 1)
+            distance = calculate_distance(prev_pos, unknown_point)
+            text_surface = font.render(str(distance), True, (255, 255, 255))
+            line_center = ((prev_pos[0] + unknown_point[0]) // 2, (prev_pos[1] + unknown_point[1]) // 2)
+            window.blit(text_surface, (line_center[0] + 10, line_center[1] + 10))
+        pygame.draw.circle(window, (255, 255, 255), unknown_point, circle_radius)
+        text_surface = font.render(f"Desconhecido: {unknown_point[0]}, {unknown_point[1]}", True, (255, 255, 255))
+        window.blit(text_surface, (unknown_point[0] + 10, unknown_point[1]))
 
-# Desenhar as marcações no círculo e traçar linhas
-for i in range(len(marks)):
-    name, pos = marks[i]
-    pygame.draw.circle(window, (255, 255, 255), pos, circle_radius)
-    text_surface = font.render(name, True, (255, 255, 255))
-    window.blit(text_surface, (pos[0] + 10, pos[1]))
-    if i > 0:
-        prev_name, prev_pos = marks[i - 1]
-        pygame.draw.line(window, (255, 255, 255), prev_pos, pos, 1)
-        distance = calculate_distance(prev_pos, pos)
-        text_surface = font.render(str(distance), True, (255, 255, 255))
-        line_center = ((prev_pos[0] + pos[0]) // 2, (prev_pos[1] + pos[1]) // 2)
-        window.blit(text_surface, (line_center[0] + 10, line_center[1] + 10))
-if unknown_point is not None:
-    if len(marks) > 0:
-        prev_pos = marks[-1][1]
-        pygame.draw.line(window, (255, 255, 255), prev_pos, unknown_point, 1)
-        distance = calculate_distance(prev_pos, unknown_point)
-        text_surface = font.render(str(distance), True, (255, 255, 255))
-        line_center = ((prev_pos[0] + unknown_point[0]) // 2, (prev_pos[1] + unknown_point[1]) // 2)
-        window.blit(text_surface, (line_center[0] + 10, line_center[1] + 10))
-    pygame.draw.circle(window, (255, 255, 255), unknown_point, circle_radius)
-    text_surface = font.render(f"Desconhecido: {unknown_point[0]}, {unknown_point[1]}", True, (255, 255, 255))
-    window.blit(text_surface, (unknown_point[0] + 10, unknown_point[1]))
+    # Exibir as mensagens no canto superior esquerdo
+    text_surface_1 = font.render(message_1, True, text_color)
+    text_surface_2 = font.render(message_2, True, text_color)
+    text_surface_3 = font.render(message_3, True, text_color)
+    window.blit(text_surface_1, (10, 10))
+    window.blit(text_surface_2, (10, 40))
+    window.blit(text_surface_3, (10, 70))
 
+    pygame.display.flip()
 
+pygame.quit()
